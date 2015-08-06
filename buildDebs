@@ -1,0 +1,32 @@
+#!/bin/bash 
+#
+# Wrapper script to run the debian package build of the zfsonlinux
+# package
+#
+
+
+pushd spl-0.6.4.2
+sed -i "s/Release\:\s*.*/Release\:      $1/g" META
+./autogen.sh
+./configure
+make deb-utils deb-kmod
+for i in `ls *.deb`; do  dpkg -i $i; done
+
+popd
+
+pushd zfs-0.6.4.2
+sed -i "s/Release\:\s*.*/Release\:      $1/g" META
+./autogen.sh
+./configure
+make deb-utils deb-kmod
+popd
+
+rm -rf debs
+mkdir debs
+
+cp -f spl-0.6.4.2/*.deb debs/
+cp zfs-0.6.4.2/*.deb debs/
+
+chmod -R 777 *
+exit $?
+
