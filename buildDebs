@@ -6,7 +6,7 @@
 
 DEBUG_BUILD_OPTION=""
 
-if [ $2 == "debug" ]
+if [ $2"" == "debug" ]
 then
 DEBUG_BUILD_OPTION="--enable-debug"
 fi
