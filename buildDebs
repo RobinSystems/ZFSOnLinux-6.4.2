@@ -5,15 +5,18 @@
 #
 
 DEBUG_BUILD_OPTION=""
+BUILD_VERSION_BEGIN=2000 
 
 if [ $2"" == "debug" ]
 then
-DEBUG_BUILD_OPTION="--enable-debug"
+	DEBUG_BUILD_OPTION="--enable-debug"
+    BUILD_VERSION_BEGIN=2500
 fi
 
+BUILD_VERSION=`expr $BUILD_VERSION_BEGIN + $1`
 
 pushd spl-0.6.4.2
-sed -i "s/Release\:\s*.*/Release\:      $1/g" META
+sed -i "s/Release\:\s*.*/Release\:      $BUILD_VERSION/g" META
 ./autogen.sh
 ./configure $DEBUG_BUILD_OPTION
 make deb-utils deb-kmod
@@ -22,7 +25,7 @@ for i in `ls *.deb`; do  dpkg -i $i; done
 popd
 
 pushd zfs-0.6.4.2
-sed -i "s/Release\:\s*.*/Release\:      $1/g" META
+sed -i "s/Release\:\s*.*/Release\:      $BUILD_VERSION/g" META
 ./autogen.sh
 ./configure $DEBUG_BUILD_OPTION
 make deb-utils deb-kmod
@@ -36,4 +39,3 @@ cp zfs-0.6.4.2/*.deb debs/
 
 chmod -R 777 *
 exit $?
-
