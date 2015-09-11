@@ -15,7 +15,7 @@ fi
 
 BUILD_VERSION=`expr $BUILD_VERSION_BEGIN + $1`
 
-pushd spl
+pushd spl-0.6.4.2
 sed -i "s/Release\:\s*.*/Release\:      $BUILD_VERSION/g" META
 ./autogen.sh
 ./configure $DEBUG_BUILD_OPTION
@@ -24,7 +24,7 @@ for i in `ls *.deb`; do  dpkg -i $i; done
 
 popd
 
-pushd zfs
+pushd zfs-0.6.4.2
 sed -i "s/Release\:\s*.*/Release\:      $BUILD_VERSION/g" META
 ./autogen.sh
 ./configure $DEBUG_BUILD_OPTION
@@ -34,8 +34,8 @@ popd
 rm -rf debs
 mkdir debs
 
-cp -f spl/*.deb debs/
-cp zfs/*.deb debs/
+cp -f spl-0.6.4.2/*.deb debs/
+cp zfs-0.6.4.2/*.deb debs/
 
 chmod -R 777 *
 exit $?
