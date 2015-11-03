@@ -1,0 +1,46 @@
+#!/bin/bash 
+#
+# Wrapper script to run the rpm package build of the zfsonlinux
+# package
+#
+
+DEBUG_BUILD_OPTION=""
+BUILD_VERSION_BEGIN=1000
+
+if [ $2"" == "debug" ]
+then
+	DEBUG_BUILD_OPTION="--enable-debug"
+    BUILD_VERSION_BEGIN=1500
+fi
+
+BUILD_VERSION=`expr $BUILD_VERSION_BEGIN + $1`
+
+pushd spl-0.6.4.2
+sed -i "s/Release\:\s*.*/Release\:      $BUILD_VERSION/g" META
+./autogen.sh
+./configure $DEBUG_BUILD_OPTION
+make rpm-utils rpm-kmod
+for i in `ls *.rpm`; do rpm -ivh $i; done
+# Install the spl packages, they are required to build zfs.
+yum localinstall -y \
+        kmod-spl-devel-0.6.4.2-1000.el7.centos.x86_64.rpm \
+        kmod-spl-devel-3.10.0-229.14.1.el7.x86_64-0.6.4.2-1000.el7.centos.x86_64.rpm \
+        kmod-spl-3.10.0-229.14.1.el7.x86_64-0.6.4.2-1000.el7.centos.x86_64.rpm \
+        spl-0.6.4.2-1000.el7.centos.x86_64.rpm
+popd
+
+pushd zfs-0.6.4.2
+sed -i "s/Release\:\s*.*/Release\:      $BUILD_VERSION/g" META
+./autogen.sh
+./configure $DEBUG_BUILD_OPTION
+make rpm-utils rpm-kmod
+popd
+
+rm -rf rpms
+mkdir rpms
+
+cp -f spl-0.6.4.2/*.rpm rpms/
+cp zfs-0.6.4.2/*.rpm rpms/
+
+chmod -R 777 *
+exit $?
